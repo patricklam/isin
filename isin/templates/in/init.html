@@ -1,0 +1,20 @@
+{% extends "in/base.html" %}
+
+{% block content %}
+<h1>Is Patrick Lam In?</h1>
+
+{% if msgs %}<p><strong>{{ msgs|safe }}</strong></p>{% endif %}
+
+<form action="{% url 'init' %}" method="post">
+{% csrf_token %}
+    <select name="status">
+     <option value="out">out</option>
+     <option value="in_DC2597D">in DC2597D</option>
+     <option value="in_DC2553">in DC2553</option>
+     <option value="other">other</option>
+    </select>
+    <input type="text" name="other_status" />
+    <input type="submit" value="Initialize" />
+</form>
+
+{% endblock %}
