@@ -1,7 +1,8 @@
 {% extends "in/base.html" %}
 
 {% block content %}
-<h1>Is Patrick Lam In?</h1>
+<h1>Patrick is {{in}}.</h1>
+<p style="font-size:small">(last update: {{date}})</p>
 
 {% if msgs %}<p><strong>{{ msgs|safe }}</strong></p>{% endif %}
 
