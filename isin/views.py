@@ -16,7 +16,8 @@ def index(request):
     return render(request, 'in/index.html', context)
 
 def init(request):
-    if not request.user.is_superuser: return render(request, 'in/index.html', {})
+    if not request.user.is_superuser: 
+        return index(request)
 
     params = request.POST
     msgs = ''
