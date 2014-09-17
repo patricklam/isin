@@ -9,9 +9,10 @@ def index(request):
     params = request.POST
     uid = request.user.username
     as_superuser = request.user.is_superuser and not('fake' in params and params['fake'] != '')
-    isin = Status.objects.first()
+    isin = Status.objects.order_by('pub_date').last()
     context = {'who' : uid,
-               'in' : isin.status}
+               'in' : isin.status,
+               'date' : isin.pub_date}
     return render(request, 'in/index.html', context)
 
 def init(request):
@@ -21,12 +22,15 @@ def init(request):
     msgs = ''
     if 'status' in params:
         eastern=pytz.timezone('US/Eastern')
-        Status.objects.all().delete()
         s = params['status'].replace('_', ' ')
         if s == 'other': s = params['other_status']
         Status(status=s, pub_date=datetime.now(eastern)).save()
         msgs = msgs + "Reset status to "+s+".<br />"
-    return render(request, 'in/init.html', {'msgs': msgs})
+    isin = Status.objects.order_by('pub_date').last()
+    context = {'in' : isin.status,
+               'date' : isin.pub_date,
+               'msgs' : msgs}
+    return render(request, 'in/init.html', context)
 
 def quickinit(request):
     if not request.user.is_superuser: return render(request, 'in/index.html', {})
@@ -42,4 +46,8 @@ def quickinit(request):
     if (ip_text.endswith("teksavvy.com.")): 
         msgs = 'home'
         Status(status='out', pub_date=datetime.now(eastern)).save()
-    return render(request, 'in/init.html', {'msgs': msgs})
+    isin = Status.objects.order_by('pub_date').last()
+    context = {'in' : isin.status,
+               'date' : isin.pub_date,
+               'msgs' : msgs}
+    return render(request, 'in/init.html', context)
