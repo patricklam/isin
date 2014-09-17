@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^$', views.index, name='index'),
-    url(r'^init$', views.init, name='init'),
+    url(r'^u$', views.init, name='init'),
     url(r'^q$', views.quickinit, name='quick_init'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', 'django_cas.views.login', name='login'),
