@@ -31,7 +31,7 @@ def init(request):
     context = {'in' : isin.status,
                'date' : isin.pub_date,
                'msgs' : msgs}
-    return render(request, 'in/init.html', context)
+    return render(request, 'in/update.html', context)
 
 def quickinit(request):
     if not request.user.is_superuser: return render(request, 'in/index.html', {})
@@ -51,4 +51,4 @@ def quickinit(request):
     context = {'in' : isin.status,
                'date' : isin.pub_date,
                'msgs' : msgs}
-    return render(request, 'in/init.html', context)
+    return render(request, 'in/update.html', context)

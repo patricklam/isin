@@ -8,13 +8,13 @@
 
 <form action="{% url 'init' %}" method="post">
 {% csrf_token %}
-    <select name="status">
+    <select id="dropdown" name="status" onchange="lf = document.getElementById('longform'); if (this.selectedIndex != this.length - 1) lf.value = '';">
      <option value="out">out</option>
      <option value="in_DC2597D">in DC2597D</option>
      <option value="in_DC2553">in DC2553</option>
      <option value="other">other</option>
     </select>
-    <input type="text" name="other_status" />
+    <input id="longform" type="text" name="other_status" onchange="dd = document.getElementById('dropdown'); dd.selectedIndex = dd.length-1;" />
     <input type="submit" value="Initialize" />
 </form>
 
