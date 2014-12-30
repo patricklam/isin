@@ -5,17 +5,21 @@ from dns import resolver, reversename
 from datetime import datetime, timedelta
 import pytz
 
+def get_most_recent_status_if_available():
+    isin = Status.objects.order_by('pub_date').last()
+    if (isin == None):
+        isin = Status(status = "without status.", pub_date = "N/A")
+    return isin
+
 def index(request):
     params = request.POST
     uid = request.user.username
     as_superuser = request.user.is_superuser and not('fake' in params and params['fake'] != '')
-    isin = Status.objects.order_by('pub_date').last()
-    context = {'who' : uid,
-               'in' : isin.status,
-               'date' : isin.pub_date}
+    s = get_most_recent_status_if_available()
+    context = {'s' : s}
     return render(request, 'in/index.html', context)
 
-def init(request):
+def update(request):
     if not request.user.is_superuser: 
         return index(request)
 
@@ -27,13 +31,12 @@ def init(request):
         if s == 'other': s = params['other_status']
         Status(status=s, pub_date=datetime.now(eastern)).save()
         msgs = msgs + "Reset status to "+s+".<br />"
-    isin = Status.objects.order_by('pub_date').last()
-    context = {'in' : isin.status,
-               'date' : isin.pub_date,
+    s = get_most_recent_status_if_available()
+    context = {'s' : s,
                'msgs' : msgs}
     return render(request, 'in/update.html', context)
 
-def quickinit(request):
+def quick_update(request):
     if not request.user.is_superuser: return render(request, 'in/index.html', {})
     eastern=pytz.timezone('US/Eastern')
 
@@ -41,14 +44,13 @@ def quickinit(request):
     ip = request.META.get('REMOTE_ADDR')
     if (ip == '129.97.90.101'): 
         msgs = 'cambridge'
-        Status(status='in DC2597D', pub_date=datetime.now(eastern)).save()
+        Status(status='in DC2597D.', pub_date=datetime.now(eastern)).save()
     ip_addr = reversename.from_address(ip)
     ip_text = str(resolver.query(ip_addr, "PTR")[0])
     if (ip_text.endswith("teksavvy.com.")): 
         msgs = 'home'
         Status(status='out', pub_date=datetime.now(eastern)).save()
-    isin = Status.objects.order_by('pub_date').last()
-    context = {'in' : isin.status,
-               'date' : isin.pub_date,
+    s = get_most_recent_status_if_available()
+    context = {'s' : s,
                'msgs' : msgs}
     return render(request, 'in/update.html', context)

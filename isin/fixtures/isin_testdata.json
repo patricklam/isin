@@ -1,0 +1,11 @@
+[
+{
+    "pk": 1, 
+    "model": "isin.status", 
+    "fields": {
+        "status": "away in Montreal for the holidays; see you January 5", 
+        "image": "", 
+        "pub_date": "2014-12-23T19:10:57.838Z"
+    }
+}
+]

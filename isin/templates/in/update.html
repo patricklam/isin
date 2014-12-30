@@ -1,9 +1,6 @@
-{% extends "in/base.html" %}
+{% extends "in/in.html" %}
 
-{% block content %}
-<h1>Patrick is {{in}}.</h1>
-<p style="font-size:small">(last update: {{date}})</p>
-
+{% block update %}
 {% if msgs %}<p><strong>{{ msgs|safe }}</strong></p>{% endif %}
 
 <form action="{% url 'init' %}" method="post">
@@ -15,7 +12,7 @@
      <option value="other">other</option>
     </select>
     <input id="longform" type="text" name="other_status" onchange="dd = document.getElementById('dropdown'); dd.selectedIndex = dd.length-1;" />
-    <input type="submit" value="Initialize" />
+    <input type="submit" value="Set status" />
 </form>
 
 {% endblock %}
