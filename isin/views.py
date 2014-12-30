@@ -8,7 +8,7 @@ import pytz
 def get_most_recent_status_if_available():
     isin = Status.objects.order_by('pub_date').last()
     if (isin == None):
-        isin = Status(status = "without status.", pub_date = "N/A")
+        isin = Status(status = "without status", pub_date = "N/A")
     return isin
 
 def index(request):
@@ -29,8 +29,9 @@ def update(request):
         eastern=pytz.timezone('US/Eastern')
         s = params['status'].replace('_', ' ')
         if s == 'other': s = params['other_status']
+        if not s.endswith('.'): s += '.'
         Status(status=s, pub_date=datetime.now(eastern)).save()
-        msgs = msgs + "Reset status to "+s+".<br />"
+        msgs = msgs + "Reset status to "+s+"<br />"
     s = get_most_recent_status_if_available()
     context = {'s' : s,
                'msgs' : msgs}
@@ -50,7 +51,7 @@ def quick_update(request):
         ip_text = str(resolver.query(ip_addr, "PTR")[0])
         if (ip_text.endswith("teksavvy.com.")): 
             msgs = 'home'
-            Status(status='out', pub_date=datetime.now(eastern)).save()
+            Status(status='out.', pub_date=datetime.now(eastern)).save()
     s = get_most_recent_status_if_available()
     context = {'s' : s,
                'msgs' : msgs}
