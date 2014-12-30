@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
     'isin'
 )
 
@@ -94,3 +95,13 @@ AUTHENTICATION_BACKENDS = (
 )
 MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 CAS_SERVER_URL = 'https://cas.uwaterloo.ca/cas/'
+
+# Tests
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'isin' app
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=isin',
+]
