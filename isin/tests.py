@@ -96,7 +96,7 @@ class UpdateTests(TestCase):
         self.assertTrue(l)
         self.client.post('/u', {'status': u'outUniqToken'})
         resp = self.client.get('/u')
-        self.assertEquals(u'outUniqToken', resp.context['s'].status)
+        self.assertEquals(u'outUniqToken.', resp.context['s'].status)
 
     def test_replace_older_update(self):
         user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
@@ -105,7 +105,7 @@ class UpdateTests(TestCase):
         self.client.post('/u', {'status': u'outUniqToken'})
         self.client.post('/u', {'status': u'followpainshortdirect'})
         resp = self.client.get('/u')
-        self.assertEquals(u'followpainshortdirect', resp.context['s'].status)
+        self.assertEquals(u'followpainshortdirect.', resp.context['s'].status)
 
     def test_do_not_replace_older_update(self):
         user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
