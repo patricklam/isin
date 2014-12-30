@@ -14,13 +14,13 @@ def get_most_recent_status_if_available():
 def index(request):
     params = request.POST
     uid = request.user.username
-    as_superuser = request.user.is_superuser and not('fake' in params and params['fake'] != '')
+    as_staff = request.user.is_staff and not('fake' in params and params['fake'] != '')
     s = get_most_recent_status_if_available()
     context = {'s' : s}
     return render(request, 'in/index.html', context)
 
 def update(request):
-    if not request.user.is_superuser: 
+    if not request.user.is_staff: 
         return index(request)
 
     params = request.POST
@@ -37,7 +37,7 @@ def update(request):
     return render(request, 'in/update.html', context)
 
 def quick_update(request):
-    if not request.user.is_superuser: return render(request, 'in/index.html', {})
+    if not request.user.is_staff: return render(request, 'in/index.html', {})
     eastern=pytz.timezone('US/Eastern')
 
     msgs = 'unknown IP'
@@ -45,11 +45,12 @@ def quick_update(request):
     if (ip == '129.97.90.101'): 
         msgs = 'cambridge'
         Status(status='in DC2597D.', pub_date=datetime.now(eastern)).save()
-    ip_addr = reversename.from_address(ip)
-    ip_text = str(resolver.query(ip_addr, "PTR")[0])
-    if (ip_text.endswith("teksavvy.com.")): 
-        msgs = 'home'
-        Status(status='out', pub_date=datetime.now(eastern)).save()
+    else:
+        ip_addr = reversename.from_address(ip)
+        ip_text = str(resolver.query(ip_addr, "PTR")[0])
+        if (ip_text.endswith("teksavvy.com.")): 
+            msgs = 'home'
+            Status(status='out', pub_date=datetime.now(eastern)).save()
     s = get_most_recent_status_if_available()
     context = {'s' : s,
                'msgs' : msgs}

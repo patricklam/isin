@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
+from django.contrib.auth.models import User
 import datetime
 from models import Status
 
@@ -48,7 +49,92 @@ class UpdateTests(TestCase):
         self.assertIn('Login', resp.content)
         self.assertNotIn('submit', resp.content)
 
-        #self.assertEqual([poll.pk for poll in resp.context['latest_poll_list']], [1])
+    def test_not_logged_in_cant_update_status(self):
+        resp = self.client.post('/u', {'status': 'out'})
+        resp = self.client.get('/')
+        self.assertIn('without status', resp.context['s'].status)
+
+    def test_log_in_no_user(self):
+        l = self.client.login(username='plam', password='secret')
+        self.assertFalse(l)
+        resp = self.client.get('/u')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Login', resp.content)
+        self.assertNotIn('submit', resp.content)
+
+    def test_log_in_bad_password(self):
+        user = User.objects.create_user('plam', 'p.lam@ece.uwaterloo.ca', 'sekrit')
+        l = self.client.login(username='plam', password='secret')
+        self.assertFalse(l)
+        resp = self.client.get('/u')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Login', resp.content)
+        self.assertNotIn('submit', resp.content)
+
+    def test_logged_in_not_admin(self):
+        user = User.objects.create_user('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        resp = self.client.get('/u')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Logout', resp.content)
+        self.assertNotIn('submit', resp.content)
+
+    def test_logged_in_admin(self):
+        user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        resp = self.client.get('/u')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Logout', resp.content)
+        self.assertIn('submit', resp.content)
+        self.assertIn('without status', resp.context['s'].status)
+
+    def test_update(self):
+        user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        self.client.post('/u', {'status': u'outUniqToken'})
+        resp = self.client.get('/u')
+        self.assertEquals(u'outUniqToken', resp.context['s'].status)
+
+    def test_replace_older_update(self):
+        user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        self.client.post('/u', {'status': u'outUniqToken'})
+        self.client.post('/u', {'status': u'followpainshortdirect'})
+        resp = self.client.get('/u')
+        self.assertEquals(u'followpainshortdirect', resp.context['s'].status)
+
+    def test_do_not_replace_older_update(self):
+        user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        create_status('newest', 1)
+        self.client.post('/u', {'status': u'followpainshortdirect'})
+        resp = self.client.get('/u')
+        self.assertEquals(u'newest', resp.context['s'].status)
+
+class QuickUpdateTests(TestCase):
+    """ Tests quick-update (i.e. update-by-ip-address) functionality.
+
+    Uses the hardcoded IP address as a test. Since we don't have a mock reverse-DNS library, we won't test the DNS functionality.
+    """
+    def test_not_logged_in(self):
+        resp = self.client.get('/q')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Login', resp.content)
+        self.assertNotIn('submit', resp.content)
+
+    def test_not_logged_in(self):
+        user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
+        l = self.client.login(username='plam', password='secret')
+        self.assertTrue(l)
+        resp = self.client.get('/q', REMOTE_ADDR='129.97.90.101')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('cambridge', resp.content)
+        self.assertIn('DC2597D', resp.context['s'].status)
 
 # random python debugging hint:
 #import pdb; pdb.set_trace()

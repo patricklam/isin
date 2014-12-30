@@ -1,9 +1,9 @@
-{% extends "in/in.html" %}
+{% extends "in/index.html" %}
 
 {% block update %}
 {% if msgs %}<p><strong>{{ msgs|safe }}</strong></p>{% endif %}
 
-<form action="{% url 'init' %}" method="post">
+<form action="{% url 'update' %}" method="post">
 {% csrf_token %}
     <select id="dropdown" name="status" onchange="lf = document.getElementById('longform'); if (this.selectedIndex != this.length - 1) lf.value = '';">
      <option value="out">out</option>
