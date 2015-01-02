@@ -14,7 +14,7 @@ class EmptyDBTests(TestCase):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('s' in resp.context)
-        self.assertIn('without status', resp.context['s'].status)
+        self.assertEqual('without status', resp.context['s'].status)
 
     def test_index_view_two_statuses_one_in_past(self):
         create_status("future status", 1)
@@ -126,9 +126,9 @@ class QuickUpdateTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Login', resp.content)
         self.assertNotIn('submit', resp.content)
-        self.assertIn('without status', resp.content)
+        self.assertEqual('without status', resp.context['s'].status)
 
-    def test_not_logged_in(self):
+    def test_quick_update_from_cambridge(self):
         user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
         l = self.client.login(username='plam', password='secret')
         self.assertTrue(l)
