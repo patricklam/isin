@@ -126,6 +126,7 @@ class QuickUpdateTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Login', resp.content)
         self.assertNotIn('submit', resp.content)
+        self.assertIn('without status', resp.content)
 
     def test_not_logged_in(self):
         user = User.objects.create_superuser('plam', 'p.lam@ece.uwaterloo.ca', 'secret')
