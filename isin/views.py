@@ -38,7 +38,8 @@ def update(request):
     return render(request, 'in/update.html', context)
 
 def quick_update(request):
-    if not request.user.is_staff: return render(request, 'in/index.html', {})
+    if not request.user.is_staff:
+        return index(request)
     eastern=pytz.timezone('US/Eastern')
 
     msgs = 'unknown IP'
